@@ -1,3 +1,4 @@
+import {locale} from './i18n.mjs';
 import {splitRemainder} from './pos-experience.mjs';
 export const paymentMethods={cash:'Cash',credit_card:'Kartu kredit',debit_card:'Kartu debit',qr:'QR / QRIS',bank_transfer:'Transfer bank',other:'Lainnya'};
 export function chargeTotals(order,discount=0){const net=order.subtotal-discount,service=Math.round(net*(order.service_bps||0)/10000),tax=Math.round((net+(order.tax_on_service?service:0))*(order.tax_bps||0)/10000);return {net,service,tax,total:net+service+tax}}
