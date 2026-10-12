@@ -1,22 +1,20 @@
-# SUMS POS
+# SUMS POS v0.2
 
-Dedicated web POS project for independent businesses, separate from SUMS Studio.
+Dedicated repository and Supabase project for POS, separate from SUMS Studio.
 
-## v0.1 interactive demo
+## Online workspace
 
-- Owner dashboard with sales totals and seven-day chart.
-- Catalog, pricing, available stock and active/inactive products.
-- Cashier/waiter order entry and stock reservation.
-- Cash settlement with change calculation; owner cancellation restores stock.
-- Browser receipt/order printing and CSV sales export.
-- Browser-local business workspaces and brand personalization.
-- Role simulation for owner, cashier and waiter.
+Email/password login, business onboarding and personalization, owner/cashier/waiter permissions, custom permission assignment to registered staff, persistent catalog, atomic order stock reservations, idempotent cash settlement, cancellations and stock/audit ledgers. Database operations use RLS and permission-checked private functions. Browser receives only a publishable key.
 
-**This is a browser-local demo, not a production authenticated POS.** Data stays in localStorage on the current browser. The role picker does not enforce security. Seed transactions are sample data. Cash payments are only recorded, not processed. Bluetooth direct printing, dedicated database, sign-up/authentication, staff invitations, custom roles and cross-device realtime are not connected yet. Reports currently use today/rolling seven/rolling thirty days, not calendar week/month.
+Automatic refresh currently polls every 15 seconds; event-based realtime is not implemented yet. Order history currently loads the latest 1,000 records. Reports summarize only the loaded records using device-local today/rolling 7/30-day boundaries; full calendar reporting is not yet implemented. This limit must be removed before production reporting.
 
-## Run and check
+## Demo
 
-Requires Node.js 20+ for checks and Python 3 for the local server. No npm dependencies.
+Choose “Lihat demo tanpa login” for browser-local sample data. Demo roles are simulations; online roles are enforced in the database.
+
+## Checks and build
+
+Node.js 20+ and Python 3, no npm dependencies.
 
 ```sh
 npm run check
@@ -25,8 +23,8 @@ npm run build
 npm run dev
 ```
 
-Open http://localhost:5173 . Static deployment output is `dist/` after building. No CI workflow is enabled.
+Static output: dist/. Database schema: database/001_core.sql (already applied to the dedicated project). Database tests: tests/database.sql — transactional fixtures are rolled back. Do not apply the initial schema twice.
 
-Try: Online POS → select product → save order → Orders → Pay → enter cash → Reports. Switch to waiter to see order-entry permissions; switch to owner for catalog and workspace settings.
+## Before real use
 
-See [infrastructure contract](docs/ARCHITECTURE.md) for the dedicated backend, tenant isolation, payment/inventory transactions and deployment gates. Database and hosting must remain independent from SUMS Studio.
+End-to-end browser and email confirmation tests, deployed auth Site URL/redirect configuration, calendar reporting, concurrent API load tests, offline strategy, printer hardware tests and backup/restore remain outstanding. Browser print works through the device print dialog; direct Bluetooth is not implemented. Payments record cash only; no QRIS/card payment processing. Staff must register before an owner grants membership; no invitation email is sent. No CI workflow enabled.
