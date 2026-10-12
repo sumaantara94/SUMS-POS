@@ -15,3 +15,9 @@ Cancellation requires pay/orders permissions, a six-digit PIN and a 3–300 char
 Migration 008 adds the new schema and retires legacy order/payment/cancel RPC grants. 009 fixes PL/pgSQL section naming ambiguity; 010 adds unique occupancy/map constraints and money bounds. Old tabs need reload after this release. Current endpoints: pos_place_order_v3, pos_pay_order_v2, pos_cancel_order_v2. All writes check workspace membership; new tables have read RLS and no direct client mutation grants.
 
 Validation: npm check, 13 Node tests, build, transactional Supabase tests for restaurant rules, PIN/expiry, stock, tenant isolation, and current RPC regression tests. Fixtures are rolled back. Browser/device acceptance and Bluetooth hardware output are not yet verified. Cashier refresh remains polling at 15 seconds, with manual refresh available.
+
+## Simplified seating setup
+
+The default view is a responsive table list. “Jumlah & kapasitas meja” creates numbered tables from a quantity and lets the owner edit each capacity or apply it to an inclusive range. For example: 10 tables, 1–2 seats 2 guests, 3–5 seats 4 guests. Existing IDs and layouts are preserved. Decreasing quantity deactivates extra tables without deleting order history and rejects removal of tables with open orders. Inactive tables can be reactivated; up to 144 retained table records per area.
+
+“Atur posisi · drag & drop” opens the area layout. Pointer events support mouse and touch; dropping into an occupied slot swaps the two positions. Position writes are owner-only, atomic and tenant-scoped. Waiter can view the layout but cannot rearrange it. Browser and Android gesture acceptance remain unverified; Node tests and rolled-back database tests cover quantity/range generation, persisted move/swap, save retry idempotency and occupied-table protection.
