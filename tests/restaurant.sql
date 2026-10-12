@@ -20,7 +20,7 @@ do $$declare b uuid:=current_setting('test.biz')::uuid;p uuid:=current_setting('
  select count(*) into n from public.pos_print_jobs where order_id=o;if n<>1 then raise exception 'print routing duplicate or missing';end if;
  if not exists(select 1 from public.pos_print_jobs where order_id=o and payload->'items'->0->>'note'='No sugar') then raise exception 'item note missing from print';end if;
  begin perform public.pos_place_order_v3(b,gen_random_uuid(),jsonb_build_array(jsonb_build_object('id',p,'qty',1)),'dinein',t,'Other','');raise exception 'occupied table accepted';exception when others then if sqlerrm='occupied table accepted' then raise;end if;end;
- begin perform public.pos_pay_order_v2(b,o,60002,null);raise exception 'waiter paid';exception when insufficient_privilege then null;end;
+ begin perform public.pos_pay_order_v3(b,o,null,jsonb_build_array(jsonb_build_object('method','cash','amount',case when (select status='paid' from public.pos_orders where id=o) then 0 else (public.pos_checkout_quote(b,o,null)->>'total')::bigint end,'tendered',60002)));raise exception 'waiter paid';exception when insufficient_privilege then null;end;
  if has_function_privilege('authenticated','public.pos_place_order(uuid,uuid,jsonb,text,text,text)','execute') then raise exception 'legacy bypass enabled';end if;
 end$$;
 select set_config('request.jwt.claim.sub',current_setting('test.cashier'),true);
@@ -28,12 +28,12 @@ do $$declare b uuid:=current_setting('test.biz')::uuid;o uuid:=current_setting('
  begin perform public.pos_cancel_order_v2(b,o,'246810','');raise exception 'empty reason accepted';exception when others then if sqlerrm='empty reason accepted' then raise;end if;end;
  r:=public.pos_cancel_order_v2(b,o,'111111','Wrong item');if (r->>'ok')::boolean then raise exception 'wrong PIN cancelled';end if;
  if not exists(select 1 from public.pos_orders where id=o and status='open') then raise exception 'wrong PIN changed status';end if;
- begin perform public.pos_pay_order_v2(b,o,1,current_setting('test.discount')::uuid);raise exception 'discount underpayment accepted';exception when others then if sqlerrm='discount underpayment accepted' then raise;end if;end;
+ begin perform public.pos_pay_order_v3(b,o,current_setting('test.discount')::uuid,jsonb_build_array(jsonb_build_object('method','cash','amount',case when (select status='paid' from public.pos_orders where id=o) then 0 else (public.pos_checkout_quote(b,o,current_setting('test.discount')::uuid)->>'total')::bigint end,'tendered',1)));raise exception 'discount underpayment accepted';exception when others then if sqlerrm='discount underpayment accepted' then raise;end if;end;
  if exists(select 1 from public.pos_order_lines where order_id=o and discount_amount<>0) then raise exception 'underpayment left partial discount';end if;
- perform public.pos_pay_order_v2(b,o,60002,current_setting('test.discount')::uuid);
+ perform public.pos_pay_order_v3(b,o,current_setting('test.discount')::uuid,jsonb_build_array(jsonb_build_object('method','cash','amount',case when (select status='paid' from public.pos_orders where id=o) then 0 else (public.pos_checkout_quote(b,o,current_setting('test.discount')::uuid)->>'total')::bigint end,'tendered',60002)));
  if not exists(select 1 from public.pos_orders where id=o and total=51002 and discount_amount=9000) then raise exception 'net total wrong';end if;
  if (select sum(discount_amount) from public.pos_order_lines where order_id=o)<>9000 then raise exception 'allocation wrong';end if;
- perform public.pos_pay_order_v2(b,o,0,null);
+ perform public.pos_pay_order_v3(b,o,null,jsonb_build_array(jsonb_build_object('method','cash','amount',case when (select status='paid' from public.pos_orders where id=o) then 0 else (public.pos_checkout_quote(b,o,null)->>'total')::bigint end,'tendered',0)));
  if (select count(*) from public.pos_payments where order_id=o)<>1 then raise exception 'duplicate payment';end if;
 end$$;
 select set_config('request.jwt.claim.sub',current_setting('test.waiter'),true);
@@ -53,7 +53,7 @@ select set_config('request.jwt.claim.sub',current_setting('test.owner'),true);
 do $$declare b uuid:=current_setting('test.biz')::uuid;d uuid;o uuid;begin
  d:=public.pos_save_discount(b,null,'Expired','fixed',100,0,null,now()-interval '2 hours',now()-interval '1 hour',true);
  o:=public.pos_place_order_v3(b,gen_random_uuid(),jsonb_build_array(jsonb_build_object('id',current_setting('test.product'),'qty',1)),'dinein',current_setting('test.table')::uuid,'Third guest','');perform set_config('test.throttleorder',o::text,true);
- begin perform public.pos_pay_order_v2(b,o,30001,d);raise exception 'expired discount accepted';exception when others then if sqlerrm='expired discount accepted' then raise;end if;end;
+ begin perform public.pos_pay_order_v3(b,o,d,jsonb_build_array(jsonb_build_object('method','cash','amount',case when (select status='paid' from public.pos_orders where id=o) then 0 else (public.pos_checkout_quote(b,o,d)->>'total')::bigint end,'tendered',30001)));raise exception 'expired discount accepted';exception when others then if sqlerrm='expired discount accepted' then raise;end if;end;
  perform public.pos_restaurant_settings(b,true,false,null);
 end$$;
 select set_config('request.jwt.claim.sub',current_setting('test.waiter'),true);

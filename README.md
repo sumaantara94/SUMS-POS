@@ -32,3 +32,7 @@ End-to-end browser and email confirmation tests, deployed auth Site URL/redirect
 ## Restaurant flow
 
 Back Office → Pengaturan bisnis configures Restaurant mode, waiter, a cancellation PIN, area/layer table maps and timed checkout discounts. Waiter selects table then guest before menu. Item notes and category print jobs are saved atomically on submit. Cashier loads orders, applies currently valid discounts, or cancels with PIN and reason. Net reports subtract allocated discounts. See docs/RELEASE-RESTAURANT.md for setup, validation and current limits. Migrations 001–010 are applied to the dedicated project; do not reapply. Reload old tabs for the current RPCs.
+
+## Seating and payment methods
+
+Red open-bill tables show elapsed time; orange reservations are controlled by cashier/owner and block waiter seating. Cashier has sales/payment reports. Back Office sets tax/service for new orders. Cash, credit/debit card, QR, transfer, other and split tender are supported as manually confirmed records. No payment gateway authorization is performed. See docs/RELEASE-SEATING-PAYMENTS.md. Migration 012 is applied.
