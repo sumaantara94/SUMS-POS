@@ -5,7 +5,7 @@ select set_config('request.jwt.claim.sub',current_setting('pos.test.owner'),true
 do $$declare b uuid;c uuid;p uuid;o uuid;cost bigint;label text;v integer;begin
  b:=public.pos_create_business('Category test','Coffee Shop','#087f6c');perform set_config('pos.test.business',b::text,true);
  c:=public.pos_save_category(b,null,'Drinks',true);p:=public.pos_save_product_v2(b,null,'Latte',c,30000,12000,5,true);
- o:=public.pos_place_order(b,gen_random_uuid(),jsonb_build_array(jsonb_build_object('id',p,'qty',2)),'dinein','','');
+ o:=public.pos_place_order_v3(b,gen_random_uuid(),jsonb_build_array(jsonb_build_object('id',p,'qty',2)),'dinein',null,'','');
  perform public.pos_save_product_v2(b,p,'Latte',c,35000,15000,3,true);perform public.pos_save_category(b,c,'Beverages',true);
  select purchase_cost,category_name into cost,label from public.pos_order_lines where order_id=o;if cost<>12000 or label<>'Drinks' then raise exception 'Historical snapshot changed';end if;
  select category into label from public.pos_products where id=p;if label<>'Beverages' then raise exception 'Category rename did not reach products';end if;

@@ -1,4 +1,4 @@
-# SUMS POS v0.2
+# SUMS POS · Restaurant operations
 
 Dedicated repository and Supabase project for POS, separate from SUMS Studio.
 
@@ -27,4 +27,8 @@ Static output: dist/. Database schema: database/001_core.sql (already applied to
 
 ## Before real use
 
-End-to-end browser and email confirmation tests, deployed auth Site URL/redirect configuration, calendar reporting, concurrent API load tests, offline strategy, printer hardware tests and backup/restore remain outstanding. Browser print works through the device print dialog; direct Bluetooth is not implemented. Payments record cash only; no QRIS/card payment processing. Staff must register before an owner grants membership; no invitation email is sent. No CI workflow enabled.
+End-to-end browser and email confirmation tests, deployed auth Site URL/redirect configuration, calendar reporting, concurrent API load tests, offline strategy, printer hardware tests and backup/restore remain outstanding. Browser print works through the device print dialog; direct Bluetooth is not implemented. Payments record cash only; no QRIS/card payment processing. Owner creates staff using name, unique username, password and cashier/waiter role; no staff email confirmation is required. No CI workflow enabled.
+
+## Restaurant flow
+
+Back Office → Pengaturan bisnis configures Restaurant mode, waiter, a cancellation PIN, area/layer table maps and timed checkout discounts. Waiter selects table then guest before menu. Item notes and category print jobs are saved atomically on submit. Cashier loads orders, applies currently valid discounts, or cancels with PIN and reason. Net reports subtract allocated discounts. See docs/RELEASE-RESTAURANT.md for setup, validation and current limits. Migrations 001–010 are applied to the dedicated project; do not reapply. Reload old tabs for the current RPCs.

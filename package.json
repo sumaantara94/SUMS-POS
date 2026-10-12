@@ -1,1 +1,12 @@
-{"name":"sums-pos","private":true,"version":"0.2.0","type":"module","scripts":{"test":"node --test tests/*.test.mjs","check":"node --check src/app.mjs && node --check src/domain.mjs && node --check src/api.mjs","dev":"python3 -m http.server 5173","build":"node scripts/build.mjs"}}
+{
+  "name": "sums-pos",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check src/app.mjs && node --check src/domain.mjs && node --check src/api.mjs && node --check src/restaurant.mjs",
+    "dev": "python3 -m http.server 5173",
+    "build": "node scripts/build.mjs"
+  }
+}
