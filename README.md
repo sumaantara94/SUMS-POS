@@ -1,21 +1,32 @@
 # SUMS POS
 
-Dedicated web POS for multiple independent businesses.
+Dedicated web POS project for independent businesses, separate from SUMS Studio.
 
-## Application surfaces
+## v0.1 interactive demo
 
-- Back office: owner dashboard, products, inventory, reporting, business personalization and staff permissions.
-- Online POS: cashier checkout, waiter orders, receipts and preparation tickets.
+- Owner dashboard with sales totals and seven-day chart.
+- Catalog, pricing, available stock and active/inactive products.
+- Cashier/waiter order entry and stock reservation.
+- Cash settlement with change calculation; owner cancellation restores stock.
+- Browser receipt/order printing and CSV sales export.
+- Browser-local business workspaces and brand personalization.
+- Role simulation for owner, cashier and waiter.
 
-## Infrastructure
+**This is a browser-local demo, not a production authenticated POS.** Data stays in localStorage on the current browser. The role picker does not enforce security. Seed transactions are sample data. Cash payments are only recorded, not processed. Bluetooth direct printing, dedicated database, sign-up/authentication, staff invitations, custom roles and cross-device realtime are not connected yet. Reports currently use today/rolling seven/rolling thirty days, not calendar week/month.
 
-Use a dedicated database and hosting configuration separate from SUMS Studio. Backend authorization must validate tenant membership and outlet-scoped permissions. Payments and inventory changes require atomic server-side transactions and an audit trail. Owner dashboards consume persisted sales events.
+## Run and check
 
-## Delivery plan
+Requires Node.js 20+ for checks and Python 3 for the local server. No npm dependencies.
 
-1. Implement and validate interactive back office and POS flows.
-2. Connect dedicated authentication and database; enforce tenant isolation and configurable roles.
-3. Verify receipt and order printing on actual printer hardware. Bluetooth integration depends on operating system, browser and printer protocol; browser printing is the initial fallback.
-4. Deploy and validate security, concurrent checkout, backups and recovery.
+```sh
+npm run check
+npm test
+npm run build
+npm run dev
+```
 
-No real payment processing or production database is configured yet. CI deployment workflows will be enabled only after infrastructure is ready.
+Open http://localhost:5173 . Static deployment output is `dist/` after building. No CI workflow is enabled.
+
+Try: Online POS → select product → save order → Orders → Pay → enter cash → Reports. Switch to waiter to see order-entry permissions; switch to owner for catalog and workspace settings.
+
+See [infrastructure contract](docs/ARCHITECTURE.md) for the dedicated backend, tenant isolation, payment/inventory transactions and deployment gates. Database and hosting must remain independent from SUMS Studio.
