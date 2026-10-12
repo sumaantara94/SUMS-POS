@@ -1,0 +1,22 @@
+begin;
+select set_config('pos.test.owner',gen_random_uuid()::text,true),set_config('pos.test.outsider',gen_random_uuid()::text,true);
+insert into auth.users(id,email) values(current_setting('pos.test.owner')::uuid,'category-owner@example.invalid'),(current_setting('pos.test.outsider')::uuid,'category-outsider@example.invalid');
+select set_config('request.jwt.claim.sub',current_setting('pos.test.owner'),true);set local role authenticated;
+do $$declare b uuid;c uuid;p uuid;o uuid;cost bigint;label text;v integer;begin
+ b:=public.pos_create_business('Category test','Coffee Shop','#087f6c');perform set_config('pos.test.business',b::text,true);
+ c:=public.pos_save_category(b,null,'Drinks',true);p:=public.pos_save_product_v2(b,null,'Latte',c,30000,12000,5,true);
+ o:=public.pos_place_order(b,gen_random_uuid(),jsonb_build_array(jsonb_build_object('id',p,'qty',2)),'dinein','','');
+ perform public.pos_save_product_v2(b,p,'Latte',c,35000,15000,3,true);perform public.pos_save_category(b,c,'Beverages',true);
+ select purchase_cost,category_name into cost,label from public.pos_order_lines where order_id=o;if cost<>12000 or label<>'Drinks' then raise exception 'Historical snapshot changed';end if;
+ select category into label from public.pos_products where id=p;if label<>'Beverages' then raise exception 'Category rename did not reach products';end if;
+ perform public.pos_save_print_config(b,'',58,jsonb_build_array(jsonb_build_object('name','Bar','width',58,'categories',jsonb_build_array(c))));
+ select receipt_width into v from public.pos_businesses where id=b;if v<>58 then raise exception 'Print width not saved';end if;
+ begin perform public.pos_create_business('Extra','Retail','#087f6c');raise exception 'upgrade gate failed';exception when others then if sqlerrm='upgrade gate failed' then raise;end if;end;
+ begin perform public.pos_save_print_config(b,'data:image/svg+xml;base64,abc',80,'[]');raise exception 'unsafe logo accepted';exception when others then if sqlerrm='unsafe logo accepted' then raise;end if;end;
+end;$$;
+select set_config('request.jwt.claim.sub',current_setting('pos.test.outsider'),true);
+do $$begin if exists(select 1 from public.pos_categories where business_id=current_setting('pos.test.business')::uuid) then raise exception 'Category tenant leak';end if;
+ begin perform public.pos_save_category(current_setting('pos.test.business')::uuid,null,'Outsider',true);raise exception 'Outsider edited category';exception when insufficient_privilege then null;end;
+end;$$;
+select 'PASS: category rename, immutable cost/category snapshots, print persistence, safe logo types, workspace upgrade gate and tenant isolation' as result;
+rollback;

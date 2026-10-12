@@ -6,7 +6,7 @@ export function placeOrder(business,cart,details,role){
  if(!cart.length)throw Error('Pilih produk terlebih dahulu');
  const counts=new Map();
  for(const l of cart){if(!Number.isSafeInteger(l.qty)||l.qty<=0)throw Error('Jumlah tidak valid');counts.set(l.id,(counts.get(l.id)||0)+l.qty)}
- const lines=[...counts].map(([id,qty])=>{const p=business.products.find(p=>p.id===id);if(!p||!p.active)throw Error('Produk tidak tersedia');if(p.stock<qty)throw Error(`Stok ${p.name} tidak cukup`);return {id,name:p.name,price:p.price,qty}});
+ const lines=[...counts].map(([id,qty])=>{const p=business.products.find(p=>p.id===id);if(!p||!p.active)throw Error('Produk tidak tersedia');if(p.stock<qty)throw Error(`Stok ${p.name} tidak cukup`);return {id,name:p.name,price:p.price,qty,purchase_cost:p.purchase_cost??null,category_id:p.category_id,category_name:p.category}});
  const order={id:crypto.randomUUID(),number:`POS-${String(business.orders.length+1).padStart(4,'0')}`,createdAt:new Date().toISOString(),lines,total:total(lines),status:'open',table:details.table.trim(),note:details.note.trim(),type:details.type};
  for(const l of lines)business.products.find(p=>p.id===l.id).stock-=l.qty;
  business.orders.unshift(order);return order;
