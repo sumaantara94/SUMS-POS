@@ -1,0 +1,20 @@
+begin;
+select set_config('test.owner',gen_random_uuid()::text,true),set_config('test.outsider',gen_random_uuid()::text,true);
+insert into auth.users(id,email) values(current_setting('test.owner')::uuid,'variant-owner@example.invalid'),(current_setting('test.outsider')::uuid,'variant-outsider@example.invalid');
+select set_config('request.jwt.claim.sub',current_setting('test.owner'),true);set local role authenticated;
+do $$declare b uuid;c uuid;p uuid;v1 uuid;v2 uuid;o uuid;begin
+ b:=public.pos_create_business('Variants test','Retail','#087f6c');perform set_config('test.biz',b::text,true);c:=public.pos_save_category(b,null,'Drinks',true);p:=public.pos_save_product_v3(b,null,'Coffee',c,25000,10000,10,true,'');perform set_config('test.product',p::text,true);
+ perform public.pos_save_variants(b,p,jsonb_build_array(jsonb_build_object('name','Regular','price',25000,'stock',3,'active',true),jsonb_build_object('name','Large','price',30000,'stock',2,'active',true)));
+ select id into v1 from public.pos_products where parent_product_id=p and variant_label='Regular';select id into v2 from public.pos_products where parent_product_id=p and variant_label='Large';
+ begin perform public.pos_place_order_v3(b,gen_random_uuid(),jsonb_build_array(jsonb_build_object('id',p,'qty',1)),'takeaway',null,'','');raise exception 'base bypass allowed';exception when others then if sqlerrm='base bypass allowed' or sqlerrm not like 'Pilih varian%' then raise;end if;end;
+ o:=public.pos_place_order_v3(b,gen_random_uuid(),jsonb_build_array(jsonb_build_object('id',v1,'qty',1),jsonb_build_object('id',v2,'qty',1,'note','No ice')),'takeaway',null,'','');
+ if not exists(select 1 from public.pos_orders where id=o and subtotal=55000) or (select count(*) from public.pos_order_lines where order_id=o)<>2 then raise exception 'variant pricing/lines wrong';end if;
+ if (select stock from public.pos_products where id=v1)<>2 or (select stock from public.pos_products where id=v2)<>1 then raise exception 'variant stock wrong';end if;
+ perform public.pos_save_product_v3(b,p,'Signature coffee',c,26000,12000,10,true,'');
+ if not exists(select 1 from public.pos_products where id=v2 and name='Signature coffee / Large' and price=30000 and purchase_cost=12000) then raise exception 'variant catalog sync wrong';end if;
+ if not exists(select 1 from public.pos_order_lines where order_id=o and product_id=v2 and name='Coffee / Large' and purchase_cost=10000) then raise exception 'historical variant snapshot changed';end if;
+end$$;
+select set_config('request.jwt.claim.sub',current_setting('test.outsider'),true);
+do $$begin begin perform public.pos_save_variants(current_setting('test.biz')::uuid,current_setting('test.product')::uuid,'[]');raise exception 'outsider variant edit';exception when insufficient_privilege then null;end;end$$;
+select 'PASS: variant prices/stock, multiple variants in one bill, base-selection guard, catalogue sync, immutable order snapshots and tenant denial' result;
+rollback;

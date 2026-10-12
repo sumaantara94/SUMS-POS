@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/app.mjs && node --check src/domain.mjs && node --check src/api.mjs && node --check src/restaurant.mjs && node --check src/payments.mjs",
+    "check": "node --check src/app.mjs && node --check src/domain.mjs && node --check src/api.mjs && node --check src/restaurant.mjs && node --check src/payments.mjs && node --check src/pos-experience.mjs",
     "dev": "python3 -m http.server 5173",
     "build": "node scripts/build.mjs"
   }
