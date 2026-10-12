@@ -31,3 +31,7 @@ Touch targets, scrollable dialogs, phone basket drawer and payment form spacing 
 ## Product variants
 
 Product edit → Kelola varian & harga configures up to 30 variants with distinct selling prices, stock and active flags. Each variant is a separate stock SKU linked to the same workspace/root product; HPP follows the root. The catalogue shows one root tile with the lowest active price, then prompts for a variant. Basket/order/section print include its name; multiple variants of a product can coexist in a bill. Root photo is used for the picker animation. Server prices and stock remain authoritative. Selecting the base directly is rejected while active variants exist. Root name/category/HPP changes propagate to future variant sales while historical order lines remain unchanged. Migrations 015/016 and rolled-back variant integration tests validate pricing, per-SKU stock, mixed variants, guards and tenant isolation.
+
+## Waiter submission feedback
+
+Product animation now follows a visible upward jump into the basket, then a landing bounce; photo/icon uses the same behavior for normal products and variants. Reduced-motion users get basket feedback without travel. Waiter submit opens a non-dismissable circular loading dialog, shows success only after server acknowledgement, preserves idempotency and basket on errors, and returns to POS table selection after confirmation. Cashier submission retains its bill-list workflow. Syntax/regression checks passed; browser/device animation acceptance is unverified.
