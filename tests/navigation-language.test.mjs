@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {posHome,posPages} from '../src/navigation.mjs';
+import {posHome,posPages,posEntry} from '../src/navigation.mjs';
 import {getLanguage,setLanguage,locale,translate,localize,protectUserText} from '../src/i18n.mjs';
 
 test('POS homes and available pages follow role and restaurant mode',()=>{
@@ -45,4 +45,15 @@ test('localization preserves user content and form values',()=>{
  assert.equal(attrs.placeholder,'Search products...');
  assert.equal(attrs.value,'Nama bisnis');
  delete globalThis.document;protectUserText([]);
+});
+
+test('Products opens the cashier catalogue while waiter seating remains first',()=>{
+ const b={restaurant_mode:true,waiter_enabled:true};
+ assert.equal(posEntry('cashier',b,null,false),'products');
+ assert.equal(posEntry('owner',b,null,false),'products');
+ assert.equal(posEntry('waiter',b,null,false),'tables');
+ assert.equal(posEntry('waiter',b,{id:'reserved'},true),'products');
+ assert.equal(posEntry('waiter',b,{id:'free'},false),'guest');
+ assert.equal(posEntry('cashier',b,{id:'free'},false),'guest');
+ assert.equal(posEntry('cashier',{restaurant_mode:false},null,false),'products');
 });

@@ -3,6 +3,15 @@ export const getLanguage=()=>language;
 export const locale=()=>language==='en'?'en-GB':'id-ID';
 export function setLanguage(value){language=value==='id'?'id':'en';try{localStorage.setItem('sums-pos-language',language)}catch{}if(typeof document!=='undefined')document.documentElement.lang=language}
 const rows=`
+Pilih meja|Select a table
+Edit reservasi|Edit reservation
+Batalkan reservasi|Cancel reservation
+Batalkan reservasi?|Cancel reservation?
+Meja akan tersedia kembali.|The table will become available again.
+Waiter dapat memilih meja reservasi untuk tamu yang sudah datang.|Waiters can select reserved tables when guests arrive.
+Reservasi telah berubah. Muat ulang dan pilih meja kembali|Reservation has changed. Refresh and select the table again
+Reservasi tidak ditemukan|Reservation not found
+
 Cari produk|Search products
 Tutup basket|Close basket
 Basket pesanan|Order basket

@@ -1,2 +1,3 @@
 export function posHome(role,business){if(role==='waiter')return business.restaurant_mode&&business.waiter_enabled?'tables':'pos';return business.restaurant_mode?'orders':'pos'}
+export function posEntry(role,business,table,guestConfirmed){if(!business.restaurant_mode)return 'products';if(role==='waiter'&&!table)return 'tables';if(table&&!guestConfirmed)return 'guest';return 'products'}
 export function posPages(role,business){if(role==='waiter')return business.restaurant_mode&&business.waiter_enabled?['tables','orders','pos','possettings']:['pos','possettings'];return business.restaurant_mode?['orders','pos','tables','reports','possettings']:['pos','orders','reports','possettings']}

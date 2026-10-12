@@ -1,0 +1,9 @@
+# Catalogue and reservation seating
+
+Cashier Products opens the catalogue directly. For restaurant dine-in, the cashier can select a table from the basket; submission requires a table and confirmed guest, preserving the basket while seating. Waiters start from Tables. Reserved tables are selectable and preload the reservation guest, then proceed to Products. Open bills remain disabled/red. The numbered Select a table introduction is removed.
+
+Cashier/owner can edit reservation guest/time or cancel from Tables & reservations. Waiters cannot manage reservations. New pos_place_order_v4 receives the selected reserved_at snapshot. It locks the table and rejects stale, cancelled or newly changed reservations, retains stock/fee validation, preserves request idempotency, and consumes the reservation in the same transaction as the open bill. Failed orders leave the reservation intact. The previous v3 endpoint remains compatible and continues blocking reserved tables for old clients.
+
+Migration 019 is applied to the POS project. Reservation creation is unchanged; editing advances the snapshot timestamp and records an audit event. Tenant/permission checks remain in private functions with empty search_path; public RPC wrappers are security invoker and anonymous execution is revoked.
+
+Validation: 29 Node tests, syntax checks and static build; rolled-back database integration verification for edits, waiter edit denial, stale/cancelled snapshot denial, failed order rollback, atomic seating, duplicate submit protection, occupied tables, and cross-workspace/anonymous denial. No fixture records persist. Existing security advisor notices are unchanged (private PIN tables deny reads without policies; Auth leaked-password protection is disabled). Browser/device rendering and physical printing remain unverified.
