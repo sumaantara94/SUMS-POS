@@ -13,3 +13,7 @@ Cashier reports are enabled by current server membership role, including existin
 Migration 012 retires cash-only v2 payment permissions and adds server-checked quote/v3 settlement. A retry of already-paid settlement creates no additional receipts. Underpayment or invalid split rolls back all payment rows and financial snapshots. Old browser tabs need a reload. Physical Bluetooth integration and browser/device acceptance are still unverified.
 
 Validation: 18 Node tests; transactional Supabase tests for reservation authorization, waiter blocks, occupancy/reseat, immutable rates, discounted tax/service, atomic split and cash change, QR recording, report rights and tenant isolation. Existing transaction/restaurant regression tests use v3 settlement. Test fixtures roll back.
+
+## Catalogue and basket layout
+
+The POS product catalogue now fills the available width, with three product columns on phones. A fixed bottom bar shows the estimated total including current tax/service and a basket item count. Press the total to submit the order; this does not settle payment. The basket button opens a drawer to review/edit quantities, item notes, order type and order-wide note. Draft note and type survive catalogue rerenders. Empty carts disable submit; in-flight submission blocks additional clicks; failed requests keep the basket. Existing server idempotency, table/guest requirements and payment workflow remain enforced. Browser/mobile layout acceptance is not verified in this environment.
