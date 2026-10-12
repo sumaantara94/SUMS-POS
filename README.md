@@ -36,3 +36,7 @@ Back Office → Pengaturan bisnis configures Restaurant mode, waiter, a cancella
 ## Seating and payment methods
 
 Red open-bill tables show elapsed time; orange reservations are controlled by cashier/owner and block waiter seating. Cashier has sales/payment reports. Back Office sets tax/service for new orders. Cash, credit/debit card, QR, transfer, other and split tender are supported as manually confirmed records. No payment gateway authorization is performed. See docs/RELEASE-SEATING-PAYMENTS.md. Migration 012 is applied.
+
+## PWA / Realtime
+
+Android install controls, fullscreen and a fixed POS shell are implemented. Workspace changes synchronize through an authenticated Supabase event feed, with a recovery refresh. Static-only caching does not support offline checkout. See docs/RELEASE-PWA.md for validation and audience/install limits.
