@@ -3,6 +3,16 @@ export const getLanguage=()=>language;
 export const locale=()=>language==='en'?'en-GB':'id-ID';
 export function setLanguage(value){language=value==='id'?'id':'en';try{localStorage.setItem('sums-pos-language',language)}catch{}if(typeof document!=='undefined')document.documentElement.lang=language}
 const rows=`
+Hapus item|Delete item
+Batalkan seluruh bill|Cancel entire bill
+Item tidak ditemukan|Item not found
+Item Complete memerlukan approval refund owner|Complete items require owner-approved refunds
+Voided|Voided
+Item void report|Item void report
+Item cancellations are listed separately from whole-bill cancellations.|Item cancellations are listed separately from whole-bill cancellations.
+No voided items.|No voided items.
+Export item voids CSV|Export item voids CSV
+
 Laba kotor sebelum refund|Gross profit before refunds
 Performa grup kategori · sebelum refund|Category performance · before refunds
 Total bill awal|Original bill total
