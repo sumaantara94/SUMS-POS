@@ -10,6 +10,6 @@ test('only completed refunds determine partial/full state; rejected items can be
 test('owner notification shows pending item/reason/actor and escapes business content',()=>{
  const b={orders:[{id:'o',number:'POS-1'}],refunds:[{id:'r',order_id:'o',status:'pending',items:[{qty:1,name:'<Coffee>'}],reason:'<No stock>',requested_by_name:'<Cashier>',amount:1000}]};
  const esc=v=>String(v).replaceAll('<','&lt;').replaceAll('>','&gt;');
- const ui=refundUI({business:()=>b,esc,money:String});const html=ui.dashboard();
- assert.ok(html.includes('1 pending'));assert.ok(html.includes('&lt;Coffee&gt;'));assert.ok(html.includes('&lt;No stock&gt;'));assert.ok(html.includes('&lt;Cashier&gt;'));assert.ok(html.includes('data-refund-view="r"'));
+ let popup='';const ui=refundUI({business:()=>b,esc,money:String,modal:html=>{popup=html;return {querySelectorAll:()=>[]}}});const html=ui.dashboard();
+ assert.ok(html.includes('1 refund requests awaiting approval'));assert.ok(html.includes('data-refund-notifications'));assert.ok(!html.includes('refund-card'));ui.notifications();assert.ok(popup.includes('&lt;Coffee&gt;'));assert.ok(popup.includes('&lt;No stock&gt;'));assert.ok(popup.includes('&lt;Cashier&gt;'));assert.ok(popup.includes('data-refund-view="r"'));b.refunds=[];assert.equal(ui.dashboard(),'');
 });
