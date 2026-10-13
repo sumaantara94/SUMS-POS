@@ -11,7 +11,7 @@ async function request(path,{method='GET',body,auth=true}={}){
  const data=await response.text();let value;try{value=JSON.parse(data)}catch{value=data}
  if(!response.ok)throw Error(value?.msg||value?.message||value?.error_description||'Koneksi gagal. Coba lagi.');return value;
 }
-export async function login(email,password){keep(await request(email.includes('@')?'/auth/v1/token?grant_type=password':'/functions/v1/staff-access',{method:'POST',body:email.includes('@')?{email,password}:{action:'login',username:email,password},auth:false}));return session}
+export async function login(email,password,portal='auto'){if(portal==='office'&&!email.includes('@'))throw Error('Use your owner email on this page');if(portal==='pos'&&!/^[a-zA-Z0-9_.-]{3,32}$/.test(email))throw Error('Use your staff username on this page');keep(await request(email.includes('@')?'/auth/v1/token?grant_type=password':'/functions/v1/staff-access',{method:'POST',body:email.includes('@')?{email,password}:{action:'login',username:email,password},auth:false}));return session}
 export async function signup(email,password){const data=await request('/auth/v1/signup',{method:'POST',body:{email,password},auth:false});if(data.access_token)keep(data);return data}
 export async function logout(){try{await request('/auth/v1/logout',{method:'POST'})}finally{keep(null);photoCache.clear()}}
 export async function verifySession(){if(!session)return null;const user=await request('/auth/v1/user');session.user=user;return session}
