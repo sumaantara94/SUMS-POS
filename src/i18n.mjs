@@ -3,6 +3,18 @@ export const getLanguage=()=>language;
 export const locale=()=>language==='en'?'en-GB':'id-ID';
 export function setLanguage(value){language=value==='id'?'id':'en';try{localStorage.setItem('sums-pos-language',language)}catch{}if(typeof document!=='undefined')document.documentElement.lang=language}
 const rows=`
+Hapus / Void|Delete / Void
+Penjualan|Sales
+Jenis laporan|Report type
+Jenis alasan|Reason type
+Pilih alasan|Select a reason
+Customer membatalkan pesanan|Customer cancelled the order
+Bahan baku habis|Ingredient out of stock
+Alasan lainnya|Other reason
+Catatan pembatalan (wajib)|Cancellation note (required)
+Konfirmasi Void|Confirm Void
+Pesanan dibatalkan dan tercatat pada laporan Cancel / Void|Order voided and recorded in the Cancel / Void report
+
 Terbuka|Open
 Selesai|Complete
 Dibatalkan|Cancelled
