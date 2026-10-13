@@ -3,6 +3,13 @@ export const getLanguage=()=>language;
 export const locale=()=>language==='en'?'en-GB':'id-ID';
 export function setLanguage(value){language=value==='id'?'id':'en';try{localStorage.setItem('sums-pos-language',language)}catch{}if(typeof document!=='undefined')document.documentElement.lang=language}
 const rows=`
+Terbuka|Open
+Selesai|Complete
+Dibatalkan|Cancelled
+Status pesanan|Order status
+Tidak ada pesanan pada status ini.|No orders with this status.
+Pesanan yang dibatalkan tercatat pada laporan Cancelled.|Cancelled orders remain in the cancellation report.
+
 Pilih meja|Select a table
 Edit reservasi|Edit reservation
 Batalkan reservasi|Cancel reservation
