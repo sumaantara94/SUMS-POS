@@ -1,5 +1,9 @@
 # SUMS POS · Restaurant operations
 
+## Local waiter/cashier Hub — 15 October 2026
+
+A local HTTPS Hub now serves POS and relays waiter orders/cashier cash transactions over outlet Wi-Fi without WAN. Install on one outlet computer using the [LAN Hub setup guide](docs/RELEASE-LAN-HUB.md). Cloud-page deployment alone does not activate LAN connectivity. Node.js 24+ and OpenSSL are required; devices must trust the local CA and enroll while online. Run `npm run hub:package` to create a runtime bundle.
+
 ## Current infrastructure — 15 October 2026
 
 Device-local orders/cash settlement, durable sync queue, cashier shifts, cash movements/expenses and a basic Owner Brief are implemented. See [offline and cash operations release notes](docs/RELEASE-OFFLINE-CASH.md) for exact setup, permissions, validations and limits. Earlier milestone notes below are historical. Offline reporting across midnight, mobile airplane-mode verification, physical printers and full accounting still need separate validation/development.

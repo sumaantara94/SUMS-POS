@@ -3,7 +3,7 @@ import {chargeTotals} from './payments.mjs';
 export const OFFLINE_LEASE_MS=12*60*60*1000;
 export function leaseValid(snapshot,now=Date.now()) {return Boolean(snapshot&&Number.isFinite(snapshot.savedAt)&&now>=snapshot.savedAt&&now-snapshot.savedAt<OFFLINE_LEASE_MS&&snapshot.business.membership?.active);}
 export function offlineSnapshot(user,business,now=Date.now()) {
- const fields=['id','name','category','accent','timezone','logo_data','receipt_width','restaurant_mode','waiter_enabled','tax_bps','service_bps','tax_on_service','membership','categories','areas','tables','print_sections'];
+ const fields=['id','name','category','accent','timezone','logo_data','receipt_width','restaurant_mode','waiter_enabled','tax_bps','service_bps','tax_on_service','membership','categories','areas','tables','print_sections','appliedRequests','_readStartedAt'];
  const b=Object.fromEntries(fields.filter(k=>business[k]!==undefined).map(k=>[k,structuredClone(business[k])]));
  b.products=business.products.map(({purchase_cost,...p})=>structuredClone(p));
  Object.assign(b,{orders:business.orders.filter(o=>o.status==='open'&&!o.local).map(o=>({...structuredClone(o),lines:o.lines.map(({purchase_cost,...l})=>structuredClone(l))})),members:[],staffAccounts:[],discounts:[],printJobs:[],openOrders:[],refunds:[],mailJobs:[],adjustments:[]});
@@ -27,17 +27,17 @@ export function makeCash(snapshot,order,tendered,{request,device},now=Date.now()
  return {id:request,user:snapshot.user,business:snapshot.business.id,device,kind:'cash',status:'pending',createdAt:new Date(now).toISOString(),payload:{order_request:order.request_id,expected_total:order.total,tendered}};
 }
 export function overlayOutbox(business,commands) {
- const b=structuredClone(business),existing=new Set(b.orders.map(o=>o.request_id));
+ const b=structuredClone(business),existing=new Set(b.orders.map(o=>o.request_id)),applied=new Set(b.appliedRequests||[]);
  for(const c of commands.filter(c=>c.kind==='order')){
   if(existing.has(c.id))continue;
   const o={...structuredClone(c.local),syncStatus:c.status,syncError:c.error||'',serverId:c.result?.order_id};
   const cash=commands.find(p=>p.kind==='cash'&&p.payload.order_request===c.id);
   if(cash){o.status='paid';o.paidAt=cash.createdAt;o.method='cash';o.tendered=cash.payload.tendered;o.change=o.tendered-o.total;o.payments=[{method:'cash',amount:o.total,tendered:o.tendered,change:o.change}];o.syncStatus=cash.status==='synced'?c.status:cash.status;o.syncError=cash.error||o.syncError;}
   b.orders.unshift(o);
-  for(const l of o.lines){const p=b.products.find(p=>p.id===l.id);if(p)p.stock=Math.max(0,p.stock-l.qty);}
+  for(const l of (applied.has(c.id)?[]:o.lines)){const p=b.products.find(p=>p.id===l.id);if(p)p.stock=Math.max(0,p.stock-l.qty);}
  }
  // A synced order may be visible before its queued cash settlement arrives.
- for(const c of commands.filter(c=>c.kind==='cash')){const o=b.orders.find(o=>o.request_id===c.payload.order_request);if(o&&!o.local&&(c.status!=='synced'||o.status!=='paid')){o.localPaymentPending=true;o.syncStatus=c.status;o.syncError=c.error||'';if(o.status==='open'){o.status='paid';o.paidAt=c.createdAt;o.method='cash';o.payments=[{method:'cash',amount:c.payload.expected_total,tendered:c.payload.tendered,change:c.payload.tendered-c.payload.expected_total}];}}}
+ for(const c of commands.filter(c=>c.kind==='cash')){const o=b.orders.find(o=>o.request_id===c.payload.order_request);if(o&&!o.local&&(c.status!=='synced'||o.status!=='paid')){o.localPaymentPending=true;o.syncStatus=c.status;o.syncError=c.error||'';if(o.status==='open'){o.status='paid';o.paidAt=c.createdAt;o.method='cash';o.tendered=c.payload.tendered;o.change=c.payload.tendered-c.payload.expected_total;o.payments=[{method:'cash',amount:c.payload.expected_total,tendered:c.payload.tendered,change:c.payload.tendered-c.payload.expected_total}];}}}
  return b;
 }
 export const retryable=e=>e?.retryable===true||e instanceof TypeError||['TimeoutError','AbortError'].includes(e?.name);
@@ -45,7 +45,7 @@ export async function drainOutbox({store,user,business,send,onChange=()=>{}}) {
  const commands=await store.list(user,business);
  for(const c of commands.filter(c=>c.status==='pending')){
   if(c.kind==='cash'&&!commands.some(o=>o.id===c.payload.order_request&&o.status==='synced'))continue;
-  try {c.result=await send(c);c.status='synced';c.error='';await store.put(c);await onChange(c);}
+  try {c.result=await send(c);c.syncedAt=Date.now();c.status='synced';c.error='';await store.put(c);await onChange(c);}
   catch(e){c.error=String(e.message||e);if(!retryable(e))c.status='review';await store.put(c);await onChange(c);if(retryable(e)||e.status===401||e.status===403)break;}
  }
 }

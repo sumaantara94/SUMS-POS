@@ -3,3 +3,17 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# Local outlet runtime identities and databases must never enter source control.
+.sums-pos-hub/
+hub-data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+hub.key
+hub.crt
+hub-ca.key
+hub-ca.crt
+hub-ca.srl
+hub.csr
+hub.ext
