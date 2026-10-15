@@ -50,3 +50,10 @@ body.pos-app-shell{height:100dvh;overflow:hidden;overscroll-behavior:none;touch-
  .pos-app-shell #app:has(.offline-banner) .sidebar{height:auto;min-height:0;flex:0 0 auto;overflow:visible}
  .pos-app-shell #app:has(.offline-banner) .content{height:auto;min-height:0;flex:1 1 0;overflow:hidden}
 }
+
+/* Mobile POS: ensure status banner never makes navigation fill the workspace. */
+@media(max-width:820px){
+ .pos-app-shell #app:has(.offline-banner) .layout{display:flex;flex-direction:column;min-height:0}
+ .pos-app-shell #app:has(.offline-banner) .sidebar{height:auto;min-height:0;flex:0 0 auto;overflow:visible}
+ .pos-app-shell #app:has(.offline-banner) .content{height:auto;min-height:0;flex:1 1 0;overflow:hidden}
+}
