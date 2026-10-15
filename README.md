@@ -1,5 +1,10 @@
 # SUMS POS · Restaurant operations
 
+## Current infrastructure — 15 October 2026
+
+Device-local orders/cash settlement, durable sync queue, cashier shifts, cash movements/expenses and a basic Owner Brief are implemented. See [offline and cash operations release notes](docs/RELEASE-OFFLINE-CASH.md) for exact setup, permissions, validations and limits. Earlier milestone notes below are historical. Offline reporting across midnight, mobile airplane-mode verification, physical printers and full accounting still need separate validation/development.
+
+
 Dedicated repository and Supabase project for POS, separate from SUMS Studio.
 
 ## Online workspace
@@ -39,4 +44,4 @@ Red open-bill tables show elapsed time; orange reservations are controlled by ca
 
 ## PWA / Realtime
 
-Android install controls, fullscreen and a fixed POS shell are implemented. Workspace changes synchronize through an authenticated Supabase event feed, with a recovery refresh. Static-only caching does not support offline checkout. See docs/RELEASE-PWA.md for validation and audience/install limits.
+Android install controls, fullscreen and a fixed POS shell are implemented. Workspace changes synchronize through an authenticated Supabase event feed, with a recovery refresh. The original static-only shell has been extended with the device outbox described above. See docs/RELEASE-PWA.md for validation and audience/install limits.

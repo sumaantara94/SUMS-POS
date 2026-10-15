@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {ownerBrief} from '../src/operations.mjs';
+test('owner brief counts current actual stock, pending approvals and open bills',()=>{assert.deepEqual(ownerBrief({products:[{active:true,stock:0},{active:true,stock:16},{active:false,stock:0}],orders:[{status:'paid'},{status:'open'}],refunds:[{status:'pending'},{status:'completed'}]}),{low:1,pending:1,open:1});});
