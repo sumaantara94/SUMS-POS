@@ -43,3 +43,10 @@ body.pos-app-shell{height:100dvh;overflow:hidden;overscroll-behavior:none;touch-
 
 .offline-banner{position:sticky;top:0;z-index:35;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#e7f5f0;color:#075e50;border-bottom:1px solid #b5dccc;padding:8px 20px;font-size:13px}.offline-banner button{padding:5px 12px;white-space:nowrap}.pos-offline .offline-banner,.offline-banner.needs-review{background:#fff1cc;color:#75520b;border-color:#ead49d}.pos-app-shell:has(.offline-banner) .layout{height:calc(100dvh - 49px)}
 .pos-app-shell #app:has(.offline-banner){display:flex;flex-direction:column}.pos-app-shell .offline-banner{position:relative;flex:0 0 auto;min-height:45px}.pos-app-shell #app:has(.offline-banner) .layout{flex:1;min-height:0;height:auto}.pos-app-shell #app:has(.offline-banner) .content,.pos-app-shell #app:has(.offline-banner) .sidebar{height:100%;min-height:0}@media print{.offline-banner{display:none!important}}
+
+/* Mobile POS: the offline banner must not make the navigation fill the entire screen. */
+@media(max-width:820px){
+ .pos-app-shell #app:has(.offline-banner) .layout{display:flex;flex-direction:column;min-height:0}
+ .pos-app-shell #app:has(.offline-banner) .sidebar{height:auto;min-height:0;flex:0 0 auto;overflow:visible}
+ .pos-app-shell #app:has(.offline-banner) .content{height:auto;min-height:0;flex:1 1 0;overflow:hidden}
+}
