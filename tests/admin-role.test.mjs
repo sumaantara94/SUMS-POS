@@ -8,18 +8,18 @@ const domain = await readFile(new URL('../src/domain.mjs', import.meta.url), 'ut
 const staff = await readFile(new URL('../functions/staff-access/index.js', import.meta.url), 'utf8');
 
 test('Admin is a supported membership role with catalog-only default permissions', () => {
-  assert.match(migration, /role in \\('owner','admin','cashier','waiter','custom'\\)/);
-  assert.match(migration, /else array\\['products'\\]/);
-  assert.doesNotMatch(migration, /else array\\[[^\\]]*'reports'[^\\]]*\\]/);
-  assert.match(domain, /admin:\\['products'\\]/);
+  assert.ok(migration.includes("check(role in ('owner','admin','cashier','waiter','custom'))"));
+  assert.ok(migration.includes("else array['products']"));
+  assert.ok(!migration.includes("else array['products','reports']"));
+  assert.ok(domain.includes("admin:['products']"));
 });
 
 test('Owner staff form exposes Admin with a clear limited scope', () => {
-  assert.match(app, /value="admin">Admin Back Office · kelola katalog produk/);
-  assert.match(staff, /!\\['cashier','waiter','admin'\\]\\.includes\\(input\\.role\\)/);
+  assert.ok(app.includes('value="admin">Admin Back Office · kelola katalog produk'));
+  assert.ok(staff.includes("!['cashier','waiter','admin'].includes(input.role)"));
 });
 
 test('Admin accounts are routed to Back Office while preserving username login on reload', () => {
-  assert.match(app, /if\\(role==='admin'\\)\\{surface='office'\\}else if\\(\\['cashier','waiter'\\]\\.includes\\(role\\)\\)/);
-  assert.match(app, /if\\(role==='admin'&&next==='pos'\\)return toast/);
+  assert.ok(app.includes("if(role==='admin'){surface='office'}else if(['cashier','waiter'].includes(role))"));
+  assert.ok(app.includes("if(role==='admin'&&next==='pos')return toast"));
 });
