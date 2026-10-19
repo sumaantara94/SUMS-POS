@@ -1,4 +1,4 @@
-export const permissions={owner:['dashboard','pos','orders','products','reports','settings'],cashier:['pos','orders'],waiter:['pos','orders']};
+export const permissions={owner:['dashboard','pos','orders','products','reports','settings'],admin:['products'],cashier:['pos','orders'],waiter:['pos','orders']};
 export function money(n){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n)}
 export function total(lines){return lines.reduce((s,l)=>s+l.price*l.qty,0)}
 export function placeOrder(business,cart,details,role){
