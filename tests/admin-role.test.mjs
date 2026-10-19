@@ -20,5 +20,5 @@ test('Owner staff form exposes Admin with a clear limited scope', () => {
 });
 
 test('Admin accounts are routed to Back Office while preserving username login on reload', () => {
-  assert.match(app, /if\(role==='admin'\)\{surface='office'\}else if\(\['cashier','waiter'\]\.includes\(role\)\)/);
+  assert.match(app, /if\(role==='admin'\)\{surface='office'\}else if\(\['cashier','waiter'\]\.includes\(role\)\)/);\n  assert.match(app, /if\(role==='admin'&&next==='pos'\)return toast/);
 });
