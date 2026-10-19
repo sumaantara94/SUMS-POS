@@ -16,7 +16,7 @@ test('pricing page presents the approved monthly and annual package prices', () 
 
 test('pricing calls to action return to Back Office without implying checkout is live', () => {
   assert.ok(pricing.includes('href="/?app=office"'));
-  assert.ok(pricing.includes('belum tersedia') || pricing.includes('belum diimplementasikan') || pricing.includes('belum aktif'));
+  assert.ok(pricing.includes('belum diaktifkan'));
 });
 
 test('static build copies the pricing page into dist', () => {
