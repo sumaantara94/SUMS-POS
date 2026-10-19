@@ -28,7 +28,7 @@ export async function handle(req,env,fetcher=fetch){
  const bearer=req.headers.get('authorization')||'';if(!bearer.startsWith('Bearer '))return reply(401,{message:'Login owner diperlukan'});
  const b=String(input.business_id||'');if(!/^[0-9a-f-]{36}$/i.test(b))return reply(400,{message:'Bisnis tidak valid'});
  let owner;try{owner=await api('/auth/v1/user','GET',undefined,bearer.slice(7));const membership=await api('/rest/v1/pos_memberships?select=role,active&business_id=eq.'+b+'&user_id=eq.'+owner.id);if(!membership[0]?.active||membership[0].role!=='owner')return reply(403,{message:'Hanya owner dapat membuat staf'})}catch{return reply(401,{message:'Login owner diperlukan'})}
- const name=String(input.name||'').trim();if(name.length<1||name.length>80||!/^[a-z0-9_.-]{3,32}$/.test(username)||typeof input.password!=='string'||input.password.length<10||input.password.length>128||!['cashier','waiter'].includes(input.role))return reply(400,{message:'Isi nama, username 3–32 karakter, password 10–128 karakter, dan peran Kasir/Waiter'});
+ const name=String(input.name||'').trim();if(name.length<1||name.length>80||!/^[a-z0-9_.-]{3,32}$/.test(username)||typeof input.password!=='string'||input.password.length<10||input.password.length>128||!['cashier','waiter','admin'].includes(input.role))return reply(400,{message:'Isi nama, username 3–32 karakter, password 10–128 karakter, dan peran Admin/Kasir/Waiter'});
  let createdId;
  try{
   if((await api('/rest/v1/pos_staff_accounts?select=user_id&username=eq.'+encodeURIComponent(username))).length)return reply(409,{message:'Username sudah digunakan'});
