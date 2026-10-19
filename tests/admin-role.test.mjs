@@ -19,7 +19,6 @@ test('Owner staff form exposes Admin with a clear limited scope', () => {
   assert.match(staff, /!\['cashier','waiter','admin'\]\.includes\(input\.role\)/);
 });
 
-test('Admin accounts are routed to Back Office and not the cashier portal', () => {
-  assert.match(app, /if\(role==='admin'\)\{surface='office'/);
-  assert.match(app, /u\.searchParams\.set\('app','office'\)/);
+test('Admin accounts are routed to Back Office while preserving username login on reload', () => {
+  assert.match(app, /if\(role==='admin'\)\{surface='office'\}else if\(\['cashier','waiter'\]\.includes\(role\)\)/);
 });
