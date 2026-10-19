@@ -14,7 +14,8 @@ test('pricing page presents the approved monthly and annual package prices', () 
   ]) assert.ok(pricing.includes(value), `Missing pricing content: ${value}`);
 });
 
-test('pricing calls to action return to Back Office without implying checkout is live', () => {
+test('pricing page is Indonesian and calls to action return to Back Office without implying checkout is live', () => {
+  assert.ok(pricing.includes('<html lang="id">'));
   assert.ok(pricing.includes('href="/?app=office"'));
   assert.ok(pricing.includes('belum diaktifkan'));
 });
